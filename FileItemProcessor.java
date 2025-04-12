@@ -1,10 +1,6 @@
-@Bean
-    public JobRepository jobRepository() throws Exception {
-        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-        factory.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
-        factory.setTablePrefix("BATCH_");
-        factory.setMaxVarCharLength(1000);
-        // 使用内存数据库
-        factory.setDataSource(null);
-        return factory.getObject();
-    }
+JobInstanceDao jobInstanceDao = new org.springframework.batch.core.repository.dao.MapJobInstanceDao();
+        JobExecutionDao jobExecutionDao = new org.springframework.batch.core.repository.dao.MapJobExecutionDao();
+        StepExecutionDao stepExecutionDao = new org.springframework.batch.core.repository.dao.MapStepExecutionDao();
+        
+        // 创建SimpleJobRepository，不进行持久化
+        return new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
