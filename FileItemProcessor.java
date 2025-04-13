@@ -69,3 +69,42 @@ for (Map<String, Object> result : results) {
     String id = (String) result.get("id");
     // 其他处理逻辑...
 }
+
+
+-----------------------
+ public List<String> extractJsonStrings(String content) {
+        List<String> jsonStrings = new ArrayList<>();
+        
+        try (JsonParser parser = jsonFactory.createParser(content)) {
+            // 确保我们从一个对象开始
+            if (parser.nextToken() != JsonToken.START_OBJECT) {
+                throw new IllegalStateException("Expected content to be an object");
+            }
+            
+            // 查找 results 字段
+            while (parser.nextToken() != JsonToken.END_OBJECT) {
+                String fieldName = parser.getCurrentName();
+                if ("results".equals(fieldName)) {
+                    // 确保 results 是一个数组
+                    if (parser.nextToken() != JsonToken.START_ARRAY) {
+                        throw new IllegalStateException("Expected results to be an array");
+                    }
+                    
+                    // 处理数组中的每个对象
+                    while (parser.nextToken() != JsonToken.END_ARRAY) {
+                        // 将当前对象转换为 JSON 字符串
+                        String jsonString = objectMapper.writeValueAsString(parser.readValueAsTree());
+                        jsonStrings.add(jsonString);
+                    }
+                } else {
+                    // 跳过其他字段
+                    parser.skipChildren();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error extracting JSON strings: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return jsonStrings;
+    }
