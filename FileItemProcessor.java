@@ -51,3 +51,21 @@
         }
         return null; // End of file
     }
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+// 创建 ObjectMapper 实例
+ObjectMapper objectMapper = new ObjectMapper();
+
+// 将 JSON 字符串转换为 Map
+Map<String, Object> jsonMap = objectMapper.readValue(content, new TypeReference<Map<String, Object>>() {});
+
+// 获取 results 数组
+List<Map<String, Object>> results = (List<Map<String, Object>>) jsonMap.get("results");
+
+// 处理每个结果
+for (Map<String, Object> result : results) {
+    // 处理每个 JSON 对象
+    String id = (String) result.get("id");
+    // 其他处理逻辑...
+}
