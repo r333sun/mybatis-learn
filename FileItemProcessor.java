@@ -1,3 +1,17 @@
+JsonNode root = objectMapper.readTree(jsonString);
+
+            // 2. 从根节点中提取 "results" 数组
+            JsonNode resultsNode = root.get("results");
+
+            // 3. 将 "results" 数组中的每个元素添加到 List<JsonNode> 中
+            List<JsonNode> resultList = new ArrayList<>();
+            if (resultsNode != null && resultsNode.isArray()) {
+                for (JsonNode node : resultsNode) {
+                    resultList.add(node);
+                }
+            }
+
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
