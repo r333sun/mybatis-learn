@@ -204,4 +204,65 @@ CompositeItemProcessor	强烈推荐	多阶段、业务链式处理
 
 如果你告诉我你的每一步处理都有哪些逻辑，我可以帮你拆成 Processor 结构，并写一个完整的 Composite 示例。
 
-要不要我直接给你出一个框架化的结构？
+要不要我直接给你出一个框架化
+	------------------------------------------------------------
+	public static void main(String[] args) {
+        String jdbcURL = "jdbc:oracle:thin:@//your_db_host:port/service_name";
+        String username = "your_username";
+        String password = "your_password";
+
+        try (Connection conn = DriverManager.getConnection(jdbcURL, username, password)) {
+            // SQL 查询，假设返回的列中包含了 STRUCT 类型
+            String query = "SELECT your_struct_column FROM your_table WHERE your_condition";
+            try (PreparedStatement stmt = conn.prepareStatement(query);
+                 ResultSet rs = stmt.executeQuery()) {
+                 
+                while (rs.next()) {
+                    // 获取 STRUCT 类型的列
+                    STRUCT struct = (STRUCT) rs.getObject("your_struct_column");
+                    if (struct != null) {
+                        printValue(struct);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 根据传入对象的类型递归打印：
+     *  - 如果为null，直接打印null；
+     *  - 如果是STRUCT，则调用 printStructAttributes 递归打印；
+     *  - 如果是数组（Array），则取出数组元素逐个处理；
+     *  - 否则直接打印对象值。
+     */
+    public static void printValue(Object value) throws SQLException {
+        if (value == null) {
+            System.out.println("null");
+        } else if (value instanceof STRUCT) {
+            System.out.println("Nested STRUCT:");
+            printStructAttributes((STRUCT) value);
+        } else if (value instanceof java.sql.Array) {
+            System.out.println("Array:");
+            java.sql.Array sqlArray = (java.sql.Array) value;
+            Object[] elements = (Object[]) sqlArray.getArray();
+            for (int i = 0; i < elements.length; i++) {
+                System.out.print("Element " + i + ": ");
+                printValue(elements[i]);  // 对数组中的每个元素也递归调用
+            }
+        } else {
+            System.out.println(value);
+        }
+    }
+
+    /**
+     * 遍历并打印 STRUCT 中的所有属性。
+     */
+    public static void printStructAttributes(STRUCT struct) throws SQLException {
+        Object[] attributes = struct.getAttributes();
+        for (int i = 0; i < attributes.length; i++) {
+            System.out.print("Attribute " + i + ": ");
+            printValue(attributes[i]);  // 对每个属性进行递归处理
+        }
+    }
