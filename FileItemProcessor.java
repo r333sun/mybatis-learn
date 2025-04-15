@@ -1,17 +1,69 @@
- private final Resource resource;
-    private final ObjectMapper objectMapper;
-    private final JsonFactory jsonFactory;
-    private BufferedReader reader;
-    private JsonParser jsonParser;
-    private JsonToken currentToken;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-    public StreamingJsonFileReader(Resource resource) {
-        this.resource = resource;
-        this.objectMapper = new ObjectMapper();
-        this.jsonFactory = new JsonFactory();
-        initializeReader();
+public class ObjectComparer {
+    public static void main(String[] args) {
+        Person person1 = new Person("John", 30, "New York");
+        Person person2 = new Person("John", 25, "Los Angeles");
+
+        List<Diff> differences = compareObjects(person1, person2);
+        for (Diff diff : differences) {
+            System.out.println(diff);
+        }
     }
+
+    public static List<Diff> compareObjects(Object obj1, Object obj2) {
+        List<Diff> diffs = new ArrayList<>();
+
+        // 确保两个对象是同一类型
+        if (obj1.getClass() != obj2.getClass()) {
+            System.out.println("Objects are of different types and cannot be compared.");
+            return diffs;
+        }
+
+        // 获取类的所有字段（属性）
+        Field[] fields = obj1.getClass().getDeclaredFields();
+
+        try {
+            for (Field field : fields) {
+                field.setAccessible(true);  // 设置字段可访问
+
+                // 获取属性值
+                Object value1 = field.get(obj1);
+                Object value2 = field.get(obj2);
+
+                // 如果属性值不同，记录到 List<Diff> 中
+                if (value1 == null && value2 != null || value1 != null && !value1.equals(value2)) {
+                    diffs.add(new Diff(field.getName(), value1, value2));
+                }
+
+                // 如果字段本身是嵌套对象，则递归调用比较
+                if (value1 != null && value2 != null && value1.getClass().isAssignableFrom(value2.getClass())) {
+                    diffs.addAll(compareObjects(value1, value2));  // 递归比较并加入差异
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return diffs;
+    }
+}
+
+class Person {
+    private String name;
+    private int age;
+    private String city;
+
+    public Person(String name, int age, String city) {
+        this.name = name;
+        this.age = age;
+        this.city = city;
+    }
+
+    // Getters and Setters (if necessary)
+}
 
     private void initializeReader() {
         try {
