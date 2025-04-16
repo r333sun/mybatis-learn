@@ -1,3 +1,23 @@
+public static Map<String, String> compareMaps(Map<String, Object> map1, Map<String, Object> map2) {
+    Map<String, String> differences = new LinkedHashMap<>();
+
+    Set<String> allKeys = new HashSet<>();
+    allKeys.addAll(map1.keySet());
+    allKeys.addAll(map2.keySet());
+
+    for (String key : allKeys) {
+        Object v1 = map1.get(key);
+        Object v2 = map2.get(key);
+
+        if (!Objects.equals(v1, v2)) {
+            differences.put(key, "map1=" + v1 + ", map2=" + v2);
+        }
+    }
+
+    return differences;
+}
+
+
 JsonNode root = objectMapper.readTree(jsonString);
 
             // 2. 从根节点中提取 "results" 数组
