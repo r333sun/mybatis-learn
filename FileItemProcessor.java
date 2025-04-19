@@ -1,3 +1,23 @@
+public String callProcedure(String inputParam) {
+        List<SqlParameter> paramList = new ArrayList<>();
+        paramList.add(new SqlParameter("IN_PARAM", Types.VARCHAR));
+        paramList.add(new SqlOutParameter("OUT_PARAM", Types.VARCHAR));
+
+        Map<String, Object> result = jdbcTemplate.call(new CallableStatementCreator() {
+            @Override
+            public CallableStatement createCallableStatement(Connection con) throws SQLException {
+                CallableStatement cs = con.prepareCall("{call MY_PROCEDURE(?, ?)}");
+                cs.setString(1, inputParam);
+                cs.registerOutParameter(2, Types.VARCHAR);
+                return cs;
+            }
+        }, paramList);
+
+        return (String) result.get("OUT_PARAM");
+    }
+
+
+
 public static Map<String, String> compareMaps(Map<String, Object> map1, Map<String, Object> map2) {
     Map<String, String> differences = new LinkedHashMap<>();
 
