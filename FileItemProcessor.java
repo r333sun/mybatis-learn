@@ -1,3 +1,28 @@
+public class FieldNames {
+
+    // general-info 下的字段
+    public static final String GENERAL_INFO = "general-info";
+    public static final String FIELD_PARTY_ID = "party1";
+    public static final String FIELD_FULL_NAME = "full-name";
+    public static final String FIELD_STATUS = "status";
+    public static final String FIELD_TYPE = "type";
+
+    // related-parties 下的字段
+    public static final String RELATED_PARTIES = "related-parties";
+    public static final String RELATED_PARTY = "related-party";
+    public static final String RELATIONSHIP_TYPE = "relationship-type";
+    public static final String PARTY_ALTERNATE_ID = "party-alternate-id";
+
+    // xrefs 等
+    public static final String XREFS = "xrefs";
+    public static final String XREF = "xref";
+
+    private FieldNames() {
+        // 不允许实例化
+    }
+}
+
+
 public String callProcedure(String inputParam) {
         List<SqlParameter> paramList = new ArrayList<>();
         paramList.add(new SqlParameter("IN_PARAM", Types.VARCHAR));
